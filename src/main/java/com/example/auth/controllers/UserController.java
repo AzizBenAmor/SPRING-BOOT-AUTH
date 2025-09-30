@@ -4,6 +4,7 @@ import com.example.auth.Dtos.LoginUserRequest;
 import com.example.auth.Dtos.RegisterUserRequest;
 import com.example.auth.Dtos.UserDto;
 import com.example.auth.entities.User;
+import com.example.auth.exceptions.InvalidTokenException;
 import com.example.auth.mappers.UserMapper;
 import com.example.auth.repositories.UserRepository;
 import com.example.auth.security.JwtService;
@@ -40,10 +41,15 @@ public class UserController {
 
     @GetMapping("me")
     public UserDto me(@AuthenticationPrincipal UserDetails userDetails) {
-        return userMapper.toDto(
-                userRepository.findFirstByEmail(userDetails.getUsername())
-                        .orElseThrow()
-        );
+        try{
+            return userMapper.toDto(
+                    userRepository.findFirstByEmail(userDetails.getUsername())
+                            .orElseThrow()
+            );
+        }catch (Exception e){
+            throw new InvalidTokenException(e.getMessage());
+        }
+
     }
 
 }

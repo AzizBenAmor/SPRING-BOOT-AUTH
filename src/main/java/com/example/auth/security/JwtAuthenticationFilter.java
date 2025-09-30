@@ -40,9 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
             return;
         }
 
-        jwt = authHeader.substring(7); // remove "Bearer "
+        jwt = authHeader.substring(7);
         try {
-            userEmail = jwtService.extractEmail(jwt); // subject = email
+            userEmail = jwtService.extractEmail(jwt);
         } catch (ExpiredJwtException e) {
             throw new InvalidTokenException("Token expired");
         } catch (Exception e) {
