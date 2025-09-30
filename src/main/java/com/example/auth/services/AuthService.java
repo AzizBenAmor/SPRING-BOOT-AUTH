@@ -15,9 +15,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public String login(String email, String password) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findFirstByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        System.out.println(user);
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
