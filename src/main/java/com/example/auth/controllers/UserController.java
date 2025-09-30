@@ -9,6 +9,8 @@ import com.example.auth.repositories.UserRepository;
 import com.example.auth.security.JwtService;
 import com.example.auth.services.AuthService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,11 +39,11 @@ public class UserController {
     }
 
     @GetMapping("me")
-    public UserDto getAuthenticatedUser(@RequestHeader(name = "Authorization") String authToken){
-        authToken = authToken.replace("Bearer ", "");
-        String email = jwtService.extractEmail(authToken);
-        User user = userRepository.findFirstByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        return userMapper.toDto(user);
+    public UserDto me(@AuthenticationPrincipal UserDetails userDetails) {
+        return userMapper.toDto(
+                userRepository.findFirstByEmail(userDetails.getUsername())
+                        .orElseThrow()
+        );
     }
 
 }

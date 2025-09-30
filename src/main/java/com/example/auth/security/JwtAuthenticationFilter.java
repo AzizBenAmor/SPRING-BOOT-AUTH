@@ -1,7 +1,9 @@
 package com.example.auth.security;
 
 import com.example.auth.entities.User;
+import com.example.auth.exceptions.InvalidTokenException;
 import com.example.auth.repositories.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,7 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         }
 
         jwt = authHeader.substring(7); // remove "Bearer "
-        userEmail = jwtService.extractEmail(jwt); // subject = email
+        try {
+            userEmail = jwtService.extractEmail(jwt); // subject = email
+        } catch (ExpiredJwtException e) {
+            throw new InvalidTokenException("Token expired");
+        } catch (Exception e) {
+            throw new InvalidTokenException("Invalid token");
+        }
+
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             User user = userRepository.findFirstByEmail(userEmail).orElse(null);
